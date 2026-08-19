@@ -1,0 +1,97 @@
+name: Multi Job Dependency Practice
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+
+  # ==========================================
+  # JOB 1 - BUILD
+  # No dependency - starts first
+  # ==========================================
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Application
+        run: |
+          echo "Building application..."
+          sleep 5
+          echo "Build completed successfully!"
+
+
+  # ==========================================
+  # JOB 2 - UNIT TEST
+  # Depends on BUILD
+  # ==========================================
+  unit-test:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - name: Run Unit Tests
+        run: |
+          echo "Running unit tests..."
+          sleep 3
+          echo "Unit tests passed!"
+
+
+  # ==========================================
+  # JOB 3 - SECURITY SCAN
+  # Also depends on BUILD
+  # ==========================================
+  security-scan:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - name: Run Security Scan
+        run: |
+          echo "Running security scan..."
+          sleep 3
+          echo "Security scan completed!"
+
+
+  # ==========================================
+  # JOB 4 - PACKAGE APPLICATION
+  # Depends on BOTH Unit Test and Security Scan
+  # ==========================================
+  package:
+    runs-on: ubuntu-latest
+
+    needs:
+      - unit-test
+      - security-scan
+
+    steps:
+      - name: Package Application
+        run: |
+          echo "Packaging application..."
+          sleep 3
+          echo "Application packaged!"
+
+
+  # ==========================================
+  # JOB 5 - DEPLOY
+  # Depends on PACKAGE
+  # ==========================================
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: package
+
+    steps:
+      - name: Deploy Application
+        run: |
+          echo "Deploying application..."
+          sleep 3
+          echo "Application deployed successfully!"
