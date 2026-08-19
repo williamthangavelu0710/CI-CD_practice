@@ -1,0 +1,69 @@
+name: Multi-Job CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  # JOB 1 - BUILD
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          echo "Building application..."
+          echo "Build completed successfully!"
+
+
+  # JOB 2 - TEST
+  test:
+    runs-on: ubuntu-latest
+
+    # Test will wait for Build
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          echo "All tests passed!"
+
+
+  # JOB 3 - SECURITY SCAN
+  security-scan:
+    runs-on: ubuntu-latest
+
+    # Security scan will wait for Test
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run security scan
+        run: |
+          echo "Running security scan..."
+          echo "No vulnerabilities found!"
+
+
+  # JOB 4 - DEPLOY
+  deploy:
+    runs-on: ubuntu-latest
+
+    # Deploy will wait for Security Scan
+    needs: security-scan
+
+    steps:
+      - name: Deploy application
+        run: |
+          echo "Deploying application..."
+          echo "Deployment completed!"
